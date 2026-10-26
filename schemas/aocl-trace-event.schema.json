@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://quox.ai/aocl/schemas/aocl-trace-event.schema.json",
+  "$comment": "PROPOSED FOR UPSTREAM. Authored from AOCL v0.1 spec prose (aocl/docs/aee-binding.md, docs/observability.md, docs/examples.md) plus the AEE v1 envelope shape, for the aocl v0.2 roadmap item 'Schemas & Validators'. The aocl spec repo ships no schemas/ directory at v0.1; this is a candidate contribution. A trace line is a full AEE envelope carrying an aocl.* intent (or a delegation intent).",
+  "title": "AOCL Trace Event (v0.1)",
+  "description": "One line of an AOCL NDJSON trace: a full AEE v1 envelope. aocl.layer.* events additionally require payload.layer.id.",
+  "type": "object",
+  "required": ["v", "id", "ts", "type", "from", "to", "intent", "corr", "priority", "payload"],
+  "additionalProperties": true,
+  "properties": {
+    "v": { "type": "string", "const": "1" },
+    "id": { "type": "string", "minLength": 8 },
+    "ts": { "type": "string", "minLength": 10 },
+    "type": { "type": "string", "enum": ["task", "result", "event", "error", "stream"] },
+    "from": { "type": "string", "minLength": 1 },
+    "to": { "type": "string", "minLength": 1 },
+    "intent": { "type": "string", "minLength": 3 },
+    "corr": { "type": "string", "minLength": 8 },
+    "reply_to": { "type": ["string", "null"] },
+    "trace": {
+      "type": ["object", "null"],
+      "additionalProperties": true,
+      "properties": {
+        "trace_id": { "type": "string" },
+        "span_id": { "type": "string" }
+      }
+    },
+    "priority": { "type": "string", "enum": ["low", "normal", "high", "urgent"] },
+    "requires": { "type": ["object", "null"], "additionalProperties": true },
+    "payload": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "timing_ms": { "type": "number", "minimum": 0 }
+      }
+    },
+    "sig": { "type": ["object", "string", "null"] }
+  },
+  "$comment_context_patch": "aocl.context.patch is a per-layer event (observability.md §2: 'layer changed context'), so like aocl.layer.* it REQUIRES payload.layer.id. This keeps the schema consistent with the normalizer, which treats context.patch as layer-intended (isLayerIntent) and reports an unresolved_layer_event when no layer id is present.",
+  "allOf": [
+    {
+      "if": {
+        "properties": { "intent": { "pattern": "^aocl\\.(layer\\.|context\\.patch$)" } },
+        "required": ["intent"]
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "type": "object",
+            "required": ["layer"],
+            "properties": {
+              "layer": {
+                "type": "object",
+                "required": ["id"],
+                "properties": {
+                  "id": { "type": "string", "minLength": 3 },
+                  "version": { "type": "string" }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "type": { "enum": ["result", "error"] } } },
+      "then": {
+        "required": ["reply_to"],
+        "properties": { "reply_to": { "type": "string", "minLength": 8 } }
+      }
+    }
+  ]
+}

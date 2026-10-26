@@ -1,0 +1,32 @@
+{
+  "stack_id": "default-dag",
+  "version": "0.1",
+  "mode": "dag",
+  "nodes": [
+    {"id": "L0.ingress.normalize", "ref": "builtin:l0.normalize"},
+    {"id": "L1.identity.scope",    "ref": "builtin:l1.identity"},
+    {"id": "L2.route.smart",       "ref": "builtin:l2.router"},
+    {"id": "L3.policy.gate",       "ref": "builtin:l3.policy"},
+    {"id": "L5.context.retrieve",  "ref": "builtin:l5.context"},
+    {"id": "L7.delegate.execute",  "ref": "builtin:l7.delegate"},
+    {"id": "L9.assemble.respond",  "ref": "builtin:l9.respond"},
+    {"id": "L10.audit.writeback",  "ref": "builtin:l10.audit"},
+    {"id": "BR.realtime_alert",    "ref": "builtin:branch.alert_fast"},
+    {"id": "BR.restricted_mode",   "ref": "builtin:branch.restricted"}
+  ],
+  "edges": [
+    {"from": "L0.ingress.normalize", "to": "L1.identity.scope"},
+    {"from": "L1.identity.scope",    "to": "L2.route.smart"},
+    {"from": "L2.route.smart",       "to": "L9.assemble.respond", "when": "control.halt_pipeline == true"},
+    {"from": "L2.route.smart",       "to": "L3.policy.gate",      "when": "control.halt_pipeline != true"},
+    {"from": "L3.policy.gate",       "to": "BR.restricted_mode",  "when": "control.require_hitl == true || context.C5.Execution.mode == 'restricted'"},
+    {"from": "L3.policy.gate",       "to": "L5.context.retrieve", "when": "control.require_hitl != true && context.C5.Execution.mode != 'restricted'"},
+    {"from": "L5.context.retrieve",  "to": "L7.delegate.execute"},
+    {"from": "L7.delegate.execute",  "to": "L9.assemble.respond"},
+    {"from": "L9.assemble.respond",  "to": "L10.audit.writeback"}
+  ],
+  "defaults": {
+    "max_parallel_actions": 8,
+    "timeout_ms": 60000
+  }
+}

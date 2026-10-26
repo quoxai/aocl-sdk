@@ -1,0 +1,22 @@
+{
+  "stack_id": "realtime-alert",
+  "version": "0.1",
+  "mode": "pipeline",
+  "layers": [
+    {"id": "L0.ingress.normalize", "ref": "builtin:l0.normalize", "enabled": true},
+    {"id": "L1.identity.scope",    "ref": "builtin:l1.identity",  "enabled": true},
+    {"id": "L3.policy.gate",       "ref": "builtin:l3.policy",    "enabled": true},
+    {"id": "L7.delegate.execute",  "ref": "builtin:l7.delegate",  "enabled": true},
+    {"id": "L9.assemble.respond",  "ref": "builtin:l9.respond",   "enabled": true},
+    {"id": "L10.audit.writeback",  "ref": "builtin:l10.audit",    "enabled": true}
+  ],
+  "defaults": {
+    "timeout_ms": 15000,
+    "max_parallel_actions": 16
+  },
+  "bypass_policy": {
+    "allowed_roles": ["admin"],
+    "never_bypass": ["L1.identity.scope", "L3.policy.gate"],
+    "audit_required": true
+  }
+}

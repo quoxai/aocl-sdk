@@ -1,0 +1,52 @@
+{
+  "name": "@quox/aocl",
+  "version": "0.1.0",
+  "description": "Framework-agnostic AOCL (Agent Orchestration Control Layers) layer tracer, stack validator, and trace normalizer. The layer model and tracer are portable; policy evaluation stays in your orchestrator.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./schemas/*": "./schemas/*"
+  },
+  "bin": {
+    "aocl-trace": "./bin/aocl-trace.js"
+  },
+  "files": [
+    "dist",
+    "schemas",
+    "bin",
+    "README.md",
+    "SECURITY.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "keywords": [
+    "aocl",
+    "aee",
+    "agent",
+    "orchestration",
+    "observability",
+    "audit",
+    "layer-trace"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "ajv": "^8.17.1",
+    "typescript": "^5.4.0",
+    "vitest": "^1.6.0"
+  }
+}

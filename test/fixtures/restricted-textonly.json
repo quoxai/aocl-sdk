@@ -1,0 +1,21 @@
+{
+  "stack_id": "restricted-textonly",
+  "version": "0.1",
+  "mode": "pipeline",
+  "layers": [
+    {"id": "L0.ingress.normalize", "ref": "builtin:l0.normalize", "enabled": true},
+    {"id": "L1.identity.scope",    "ref": "builtin:l1.identity",  "enabled": true},
+    {"id": "L3.policy.gate",       "ref": "builtin:l3.policy",    "enabled": true},
+    {"id": "L6.shape.rewrite",     "ref": "builtin:l6.shape",     "enabled": true},
+    {"id": "L9.assemble.respond",  "ref": "builtin:l9.respond",   "enabled": true},
+    {"id": "L10.audit.writeback",  "ref": "builtin:l10.audit",    "enabled": true}
+  ],
+  "defaults": {
+    "timeout_ms": 30000,
+    "max_parallel_actions": 0
+  },
+  "policy_overrides": {
+    "tool_execution": "disabled",
+    "network_access": "disabled"
+  }
+}
